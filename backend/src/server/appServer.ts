@@ -42,7 +42,7 @@ export function createAppServer(balance: Balance) {
       balance.apply(transaction);
       res.status(200).send(transaction);
     } catch (e) {
-      res.status(400).send('Invalid input');
+      res.status(400).send(e.message);
     }
   });
 

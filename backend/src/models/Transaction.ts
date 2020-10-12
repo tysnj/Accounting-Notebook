@@ -31,7 +31,7 @@ export class Transaction implements TransactionInterface {
       && typeof json.amount === 'number' && json.amount > 0)
     return new Transaction(json.type, json.amount);
 
-    throw new Error('Invalid JSON');
+    throw new Error('Invalid input');
   }
 
   public isConfirmed(): boolean {
