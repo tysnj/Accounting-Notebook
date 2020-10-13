@@ -1,6 +1,7 @@
 import express from 'express';
 
 const bodyParser = require('body-parser');
+const cors = require('cors')
 import { validate as uuidValidate } from 'uuid';
 import { Balance } from '../models/Balance';
 import { Transaction } from '../models/Transaction';
@@ -8,6 +9,7 @@ import { Transaction } from '../models/Transaction';
 export function createAppServer(balance: Balance) {
   const appServer = express();
   appServer.use(bodyParser.json());
+  appServer.use(cors());
 
   // Router loading
   appServer.get('/', (req, res) => res.send('Server is alive'));
