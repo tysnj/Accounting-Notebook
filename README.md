@@ -14,6 +14,8 @@ Typescript source code is in src folder.
 
 The tests are in `test` directory. They can be checked runnning `npm run test` at backend directory.
 
+### Concurrency solution
+For the case of race conditions, where a transaction is written while some requests are trying to read a solution of readers and writers, with writing priority has been implemented. It is completely contained in `Balance` class (altough, considering that NodeJS executes JS in a single thread it is not really necessary until a database or file saving system is added)
 
 # Frontend
 TODO

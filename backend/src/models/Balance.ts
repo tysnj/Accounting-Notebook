@@ -1,10 +1,11 @@
 import { Transaction, TransactionType } from './Transaction';
+import {Mutex, MutexInterface, Semaphore, SemaphoreInterface, withTimeout} from 'async-mutex';
 
 export interface BalanceInterface {
-  getValue(): number;
-  getTransactions(): Transaction[];
-  getTransaction(id: string): Transaction | undefined;
-  apply(transaction: Transaction): Transaction;
+  getValue(): Promise<number>;
+  getTransactions(): Promise<Transaction[]>;
+  getTransaction(id: string): Promise<Transaction>;
+  apply(transaction: Transaction): Promise<Transaction>;
 }
 
 const INITIAL_VALUE = 0;
@@ -13,21 +14,70 @@ export class Balance implements BalanceInterface {
   private value: number;
   private transactions: Transaction[];
 
+  private readers = 0;
+  private writers = 0;
+  private noReaders = new Semaphore(1);
+  private noWriters = new Semaphore(1);
+
+
   constructor(value: number = INITIAL_VALUE) {
     this.value = value;
     this.transactions = [];
   }
 
-  getValue(): number {
-    return this.value;
+  private async readerEntry() {
+    await this.noReaders.acquire();
+    if (this.readers === 0) this.noWriters.acquire();
+    this.readers++;
+    this.noReaders.release();
   }
 
-  getTransactions(): Transaction[] {
-    return this.transactions;
+  private readerExit() {
+    this.readers--;
+    if (this.readers === 0) this.noWriters.release();
   }
 
-  getTransaction(id: string): Transaction | undefined {
-    return this.transactions.find(t => t.id === id);
+  async getValue(): Promise<number> {
+    let value: number;
+
+    try {
+      await this.readerEntry();
+
+      value = this.value;
+    } finally {
+      this.readerExit();
+    }
+
+    return value;
+  }
+
+  async getTransactions(): Promise<Transaction[]> {
+    let transactions: Transaction[];
+
+    try {
+      await this.readerEntry();
+
+      transactions = this.transactions;
+    } finally {
+      this.readerExit();
+    }
+
+    return transactions;
+  }
+
+  async getTransaction(id: string): Promise<Transaction> {
+    let transaction: Transaction;
+
+    try {
+      await this.readerEntry();
+
+      transaction = this.transactions.find(t => t.id === id) as Transaction;
+      if (!transaction) throw new Error('Transaction not found');
+    } finally {
+      this.readerExit();
+    }
+
+    return transaction;
   }
 
   private canConfirm(transaction: Transaction): boolean {
@@ -35,16 +85,34 @@ export class Balance implements BalanceInterface {
      return (transaction.type === TransactionType.DEBIT ? this.value >= transaction.amount : true);
   }
 
-  apply(transaction: Transaction): Transaction {
-    if (!this.canConfirm(transaction)) throw new Error('Not enough founds');
+  private async writerEntry() {
+    if (this.writers === 0) this.noReaders.acquire();
+    this.writers++;
+    this.noWriters.acquire();
+  }
 
-    // update value
-    if (transaction.type === TransactionType.DEBIT) this.value -= transaction.amount;
-    else this.value += transaction.amount;
+  private writerExit() {
+    this.noWriters.release();
+    this.writers--;
+    if (this.writers === 0) this.noReaders.release();
+  }
 
-    // save history
-    transaction.confirm();
-    this.transactions.push(transaction);
+  async apply(transaction: Transaction): Promise<Transaction> {
+    try {
+      await this.writerEntry();
+
+      if (!this.canConfirm(transaction)) throw new Error('Not enough founds');
+
+      // update value
+      if (transaction.type === TransactionType.DEBIT) this.value -= transaction.amount;
+      else this.value += transaction.amount;
+
+      // save history
+      transaction.confirm();
+      this.transactions.push(transaction);
+    } finally {
+      this.writerExit();
+    }
 
     return transaction;
   }
