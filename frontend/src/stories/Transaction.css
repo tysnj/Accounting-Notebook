@@ -1,0 +1,16 @@
+.transaction-credit {
+    color: limegreen;
+}
+
+.transaction-debit {
+    color: orangered;
+}
+
+.transaction-body {
+    display: flex;
+    flex-direction: column;
+}
+
+span {
+    font-weight: bold;
+}
