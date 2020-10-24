@@ -8,7 +8,7 @@ export enum TransactionType {
 export interface TransactionInterface {
   id: string | null;
   type: TransactionType;
-  amount: number | null;
+  amount: number;
   effectiveDate: string | null;
 }
 

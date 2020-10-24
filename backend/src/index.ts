@@ -1,9 +1,9 @@
 import { createAppServer } from './server/appServer';
-import { Balance } from './models/Balance';
+import { Account } from './models/Account';
 
 const PORT = 8000;
-const userBalance = new Balance();
-const appServer = createAppServer(userBalance);
+const userAccount = new Account();
+const appServer = createAppServer(userAccount);
 
 appServer.listen(PORT, () => {
   console.log(`⚡️[server]: Server is running at http://localhost:${PORT}`);

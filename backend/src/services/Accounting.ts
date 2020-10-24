@@ -1,29 +1,29 @@
-import { Balance } from '../models/Balance';
+import { Account } from '../models/Account';
 import { Transaction } from '../models/Transaction';
 
-const defaultBalance = new Balance();
+const defaultAccount = new Account();
 
-export class AccountingService {
-  private balance: Balance;
+export class Accounting {
+  private account: Account;
 
-  constructor(balance: Balance = defaultBalance) {
-    this.balance = balance;
+  constructor(account: Account = defaultAccount) {
+    this.account = account;
   }
 
-  saveTransaction(transaction: Transaction): Transaction {
-    return this.balance.apply(transaction);
+  saveTransaction(transaction: Transaction): Promise<Transaction> {
+    return this.account.commit(transaction);
   }
 
-  getTransactionInHistory(id: string) {
-    return this.balance.getTransaction(id);
+  getTransactionInHistory(id: string): Promise<Transaction> {
+    return this.account.getTransaction(id);
   }
 
-  getTransactionHistory(): Transaction[] {
-    return this.balance.getTransactions();
+  getTransactionHistory(): Promise<Transaction[]> {
+    return this.account.getTransactions();
   }
 
-  getBalanceStatus() {
-    return this.balance.getValue();
+  getBalanceValue(): Promise<number> {
+    return this.account.getValue();
   }
 
 }

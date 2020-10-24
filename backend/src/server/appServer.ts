@@ -3,25 +3,29 @@ import express from 'express';
 const bodyParser = require('body-parser');
 const cors = require('cors')
 import { validate as uuidValidate } from 'uuid';
-import { Balance } from '../models/Balance';
-import { Transaction } from '../models/Transaction';
 
-export function createAppServer(balance: Balance) {
+import { Account } from '../models/Account';
+import { Transaction } from '../models/Transaction';
+import { Accounting } from '../services/Accounting';
+
+export function createAppServer(account: Account) {
   const appServer = express();
   appServer.use(bodyParser.json());
   appServer.use(cors());
+
+  const accountingService = new Accounting(account);
 
   // Router loading
   appServer.get('/', (req, res) => res.send('Server is alive'));
 
   // default routes
   appServer.get('/api', async (req, res) => {
-    res.status(200).send({balance: await balance.getValue()});
+    res.status(200).send({balance: await accountingService.getBalanceValue()});
   });
 
   // transaction routes
   appServer.get('/api/transactions', async (req, res) => {
-    res.status(200).send(await balance.getTransactions());
+    res.status(200).send(await accountingService.getTransactionHistory());
   });
   appServer.get('/api/transactions/:transactionId', async (req, res) => {
     try {
@@ -31,7 +35,7 @@ export function createAppServer(balance: Balance) {
         return;
       }
 
-      const transaction = await balance.getTransaction(transactionId);
+      const transaction = await accountingService.getTransactionInHistory(transactionId);
       res.status(200).send(transaction);
 
     } catch (e) {
@@ -42,7 +46,7 @@ export function createAppServer(balance: Balance) {
     const body = req.body;
     try {
       const transaction = Transaction.fromJSON(body);
-      await balance.apply(transaction);
+      await accountingService.saveTransaction(transaction);
       res.status(200).send(transaction);
     } catch (e) {
       res.status(400).send(e.message);

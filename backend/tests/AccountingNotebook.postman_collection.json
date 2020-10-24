@@ -6,7 +6,7 @@
 	},
 	"item": [
 		{
-			"name": "GET balance",
+			"name": "GET account value",
 			"request": {
 				"method": "GET",
 				"header": [],
@@ -50,7 +50,7 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://localhost:8000/api/transactions/987e057d-fb96-4c98-8fdc-907ea7854eb7",
+					"raw": "http://localhost:8000/api/transactions/22e7c0d0-dc5a-4970-b4fb-55fa188a373e",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -59,7 +59,7 @@
 					"path": [
 						"api",
 						"transactions",
-						"987e057d-fb96-4c98-8fdc-907ea7854eb7"
+						"22e7c0d0-dc5a-4970-b4fb-55fa188a373e"
 					]
 				}
 			},
@@ -72,7 +72,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n  \"type\": \"credit\",\n  \"amount\": 100\n}",
+					"raw": "{\n  \"type\": \"credit\",\n  \"amount\": 200\n}",
 					"options": {
 						"raw": {
 							"language": "json"

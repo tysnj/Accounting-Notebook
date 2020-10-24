@@ -1,18 +1,18 @@
 import { Transaction, TransactionType } from './Transaction';
-import {Mutex, MutexInterface, Semaphore, SemaphoreInterface, withTimeout} from 'async-mutex';
+import { Semaphore } from 'async-mutex';
 
-export interface BalanceInterface {
+export interface AccountInterface {
   getValue(): Promise<number>;
   getTransactions(): Promise<Transaction[]>;
   getTransaction(id: string): Promise<Transaction>;
-  apply(transaction: Transaction): Promise<Transaction>;
+  commit(transaction: Transaction): Promise<Transaction>;
 }
 
 const INITIAL_VALUE = 0;
 
-export class Balance implements BalanceInterface {
+export class Account implements AccountInterface {
   private value: number;
-  private transactions: Transaction[];
+  private readonly transactions: Transaction[];
 
   private readers = 0;
   private writers = 0;
@@ -27,7 +27,7 @@ export class Balance implements BalanceInterface {
 
   private async readerEntry() {
     await this.noReaders.acquire();
-    if (this.readers === 0) this.noWriters.acquire();
+    if (this.readers === 0) await this.noWriters.acquire();
     this.readers++;
     this.noReaders.release();
   }
@@ -86,9 +86,9 @@ export class Balance implements BalanceInterface {
   }
 
   private async writerEntry() {
-    if (this.writers === 0) this.noReaders.acquire();
+    if (this.writers === 0) await this.noReaders.acquire();
     this.writers++;
-    this.noWriters.acquire();
+    await this.noWriters.acquire();
   }
 
   private writerExit() {
@@ -97,7 +97,7 @@ export class Balance implements BalanceInterface {
     if (this.writers === 0) this.noReaders.release();
   }
 
-  async apply(transaction: Transaction): Promise<Transaction> {
+  async commit(transaction: Transaction): Promise<Transaction> {
     try {
       await this.writerEntry();
 

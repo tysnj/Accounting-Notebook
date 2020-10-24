@@ -6,10 +6,10 @@ chai.use(chaiHttp);
 const expect = chai.expect;
 
 import { createAppServer } from '../../src/server/appServer';
-import { Balance } from '../../src/models/Balance';
+import { Account } from '../../src/models/Account';
 
-const balance = new Balance()
-const appServer = createAppServer(balance);
+const account = new Account()
+const appServer = createAppServer(account);
 
 describe('Root endpoint', async () => {
   it('Should return response on call', async () => {
