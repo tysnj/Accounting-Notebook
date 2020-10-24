@@ -1,14 +1,14 @@
 {
-  "name": "backend",
+  "name": "accountingnotebook",
   "version": "1.0.0",
-  "description": "",
+  "description": "A web application backend, which tracks money flow of a single user",
   "main": "index.js",
   "scripts": {
     "build": "npm test && tsc",
     "dev": "nodemon ./src/index.ts",
     "test": "mocha -r ts-node/register 'tests/**/*.ts'"
   },
-  "author": "",
+  "author": "Federico Amura",
   "license": "ISC",
   "dependencies": {
     "async-mutex": "^0.2.4",
