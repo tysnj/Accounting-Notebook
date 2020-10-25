@@ -27,9 +27,11 @@ Components were written with Storybook, and Material Design basic components hav
 # Installation, testing & running
 For instalation NodeJS is needed. Every command is relative to the main directory of the project.
 
+Dependencies are included in repository so no extra installation might be required. They were installed using node 14.13.1 in a x86_64 ubuntu 20.04 system. Compatibility issues might emerge if using a different setup, if that's the case, delete `frontend/node_modules` and `backend/node_modules` folders and run the following commands.
 - To install backend dependencies run `npm install` at backend
-- To check backend tests run `npm run test` at backend
 - To install frontend dependencies run `npm install` at frontend
+
+- To check backend tests run `npm run test` at backend
 
 - To start backend run `npm run dev` at backend
 - To start frontend run `npm run start` at frontend
