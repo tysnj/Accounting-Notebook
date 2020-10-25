@@ -3,8 +3,8 @@ import './App.css';
 
 import { Box, Button } from '@material-ui/core';
 
-import { Transaction } from './stories/Transaction';
-import { TransactionList } from './stories/TransactionList';
+import { Transaction } from './components/Transaction';
+import { TransactionList } from './components/TransactionList';
 import { TransactionsRepository } from './repositories/Transactions';
 
 interface AppState {

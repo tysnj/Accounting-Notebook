@@ -1,8 +1,8 @@
 import React from 'react';
 import { Story, Meta } from '@storybook/react/types-6-0';
 
-import { TransactionList, TransactionListProps } from './TransactionList';
-import { TransactionType } from './Transaction';
+import { TransactionList, TransactionListProps } from '../components/TransactionList';
+import { TransactionType } from '../components/Transaction';
 
 export default {
   title: 'Notebook/TransactionList',

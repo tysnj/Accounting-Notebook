@@ -1,7 +1,7 @@
 import React from 'react';
 import { Story, Meta } from '@storybook/react/types-6-0';
 
-import { Transaction, TransactionProps, TransactionType } from './Transaction';
+import { Transaction, TransactionProps, TransactionType } from '../components/Transaction';
 
 export default {
   title: 'Notebook/Transaction',

@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 import { Repository } from './Repository';
-import { Transaction } from '../stories/Transaction';
+import { Transaction } from '../components/Transaction';
 
 export class TransactionsRepository implements Repository<Transaction> {
 
