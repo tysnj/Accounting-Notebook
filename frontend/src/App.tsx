@@ -1,9 +1,11 @@
 import React from 'react';
-import axios from 'axios';
 import './App.css';
+
+import { Box, Button } from '@material-ui/core';
+
 import { Transaction } from './stories/Transaction';
 import { TransactionList } from './stories/TransactionList';
-import { Box, Button } from '@material-ui/core';
+import { TransactionsRepository } from './repositories/Transactions';
 
 interface AppState {
   transactionsError: boolean;
@@ -11,6 +13,8 @@ interface AppState {
 }
 
 class App extends React.Component<any, AppState> {
+  private transactionsRepository: TransactionsRepository;
+
   constructor(props: any) {
     super(props);
     this.state = {
@@ -18,22 +22,22 @@ class App extends React.Component<any, AppState> {
       transactions: [],
     };
 
+    this.transactionsRepository = new TransactionsRepository();
     this.reloadTransactions = this.reloadTransactions.bind(this);
   }
 
-  reloadTransactions() {
-    axios.get(`http://localhost:8000/api/transactions`).then(res => {
-      const transactions = res.data;
+  async reloadTransactions() {
+    try {
+      const transactions = await this.transactionsRepository.getAll();
       this.setState({transactionsError: false, transactions: transactions});
-    }).catch(error => {
+    } catch (e) {
       this.setState({transactionsError: true, transactions: []});
-      console.error('Something went wrong. You should retry');
-      console.error(`Error: ${error}`);
-    });
+      console.error(`Error while getting transactions: ${e}`);
+    }
   }
 
-  componentDidMount() {
-    this.reloadTransactions();
+  async componentDidMount() {
+    await this.reloadTransactions();
   }
 
   render() {
@@ -45,9 +49,11 @@ class App extends React.Component<any, AppState> {
         <Box className="App-separator"/>
 
         <div className="App-body">
-        {this.state.transactions.length
-          ? <TransactionList transactions={this.state.transactions}/>
-          : <h2>No transactions yet.<br/>Try reloading from server.</h2>}
+          {this.state.transactionsError
+            ? <h2>There was an error loading your transactions.<br/>Try again please.</h2>
+            : this.state.transactions.length
+              ? <TransactionList transactions={this.state.transactions}/>
+              : <h2>No transactions received.<br/>Try reloading from server.</h2>}
         </div>
       </div>
     );
