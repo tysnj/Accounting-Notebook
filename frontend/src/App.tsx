@@ -3,9 +3,10 @@ import axios from 'axios';
 import './App.css';
 import { Transaction } from './stories/Transaction';
 import { TransactionList } from './stories/TransactionList';
+import { Box, Button } from '@material-ui/core';
 
 interface AppState {
-  transactionsReady: boolean;
+  transactionsError: boolean;
   transactions: Transaction[];
 }
 
@@ -13,21 +14,41 @@ class App extends React.Component<any, AppState> {
   constructor(props: any) {
     super(props);
     this.state = {
-      transactionsReady: false,
-      transactions: []};
+      transactionsError: false,
+      transactions: [],
+    };
+
+    this.reloadTransactions = this.reloadTransactions.bind(this);
+  }
+
+  reloadTransactions() {
+    axios.get(`http://localhost:8000/api/transactions`).then(res => {
+      const transactions = res.data;
+      this.setState({transactionsError: false, transactions: transactions});
+    }).catch(error => {
+      this.setState({transactionsError: true, transactions: []});
+      console.error('Something went wrong. You should retry');
+      console.error(`Error: ${error}`);
+    });
   }
 
   componentDidMount() {
-    axios.get('http://localhost:8000/api/transactions').then(res => {
-      const transactions = res.data;
-      this.setState({transactionsReady: true, transactions: transactions});
-    });
+    this.reloadTransactions();
   }
 
   render() {
     return (
       <div className="App">
-        <TransactionList transactions={this.state.transactions}/>
+        <h1 className="App-header">Accounting Notebook</h1>
+        <Button variant="contained" color="primary" onClick={this.reloadTransactions}>Reload</Button>
+
+        <Box className="App-separator"/>
+
+        <div className="App-body">
+        {this.state.transactions.length
+          ? <TransactionList transactions={this.state.transactions}/>
+          : <h2>No transactions yet.<br/>Try reloading from server.</h2>}
+        </div>
       </div>
     );
   }
